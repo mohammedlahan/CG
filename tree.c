@@ -1,44 +1,84 @@
 #include<stdlib.h>
 #include<GL/glut.h>
-float carX = -0.8f;
-float carY = -0.5f;
-float carZ = -1.0f;
-float wheel1X=-0.7,wheel1Y=-0.3,wheel2X=-0.3,wheel2Y=-0.3;
+float manX = 0.1f;
+float manY = -1.0f;
+float manZ = -1.0f;
+float cocoX = 0.08f;
+float cocoY = 0.0f;
 static int flag=1;
 static int flagger=1;
-void drawCar(void) {
-glClear(GL_COLOR_BUFFER_BIT);
-glColor3f(0.0, 1.0, 1.0);
-glTranslatef(carX,carY,carZ);
+void drawTree(void) {
+/*TRUNK*/
+glColor3f(1.0,0.0,0.0);
 glBegin(GL_POLYGON);
-glVertex2f(-0.5,0);
-glVertex2f(-0.5,0.2);
-glVertex2f(-0.3,0.2);
-glVertex2f(-0.1,0.5);
-glVertex2f(0.1,0.5);
-glVertex2f(0.3,0.2);
-glVertex2f(0.5,0.2);
-glVertex2f(0.5,0);
+glVertex2f(0.1,-0.9);
+glVertex2f(0.4,-0.9);
+glVertex2f(0.28,0.3);
+glVertex2f(0.23,0.3);
 glEnd();
 glFlush();
-glColor3f(1.0, 0.0, 0.0);
-glTranslatef(0.3,0,0);
-glutSolidSphere(0.1,100,10);
+/*LEAF*/
+glColor3f(0.0,1.0,0.0);
+glBegin(GL_POLYGON);
+glVertex2f(0.2,0.3);
+glVertex2f(0.0,0.1);
+glVertex2f(-0.3,0.2);
+glVertex2f(-0.4,-0.1);
+glEnd();
+glFlush();
+glBegin(GL_POLYGON);
+glVertex2f(0.18,0.65);
+glVertex2f(0.23,0.3);
+glVertex2f(-0.15,0.8);
+glVertex2f(-0.25,0.6);
+glEnd();
+glFlush();
+glBegin(GL_POLYGON);
+glVertex2f(0.28,0.3);
+glVertex2f(0.48,0.1);
+glVertex2f(0.78,0.2);
+glVertex2f(0.88,-0.1);
+glEnd();
+glFlush();
+glBegin(GL_POLYGON);
+glVertex2f(0.3,0.65);
+glVertex2f(0.25,0.3);
+glVertex2f(0.63,0.8);
+glVertex2f(0.73,0.6);
+glEnd();
+glFlush();/*leaf end*/
+/*COCONUT*/
 glColor3f(1.0, 1.0, 0.0);
-glTranslatef(-0.6,0,0);
-glutSolidSphere(0.1,100,10);
+glTranslatef(0.2,0.3,0);
+glutSolidSphere(0.043,100,10);
+glTranslatef(0.06,0.05,0);
+glutSolidSphere(0.04,100,10);
+glTranslatef(cocoX,cocoY,0);
+glutSolidSphere(0.04,100,10);
 }
-void keyPress(int key, int x, int y)
+void drawMan()
 {
-if(key==GLUT_KEY_UP)
-carY += 0.05f;
-if(key==GLUT_KEY_DOWN)
-carY -= 0.05f;
-if(key==GLUT_KEY_LEFT)
-carX -= 0.05f;
-if(key==GLUT_KEY_RIGHT)
-carX += 0.05f;
-glutPostRedisplay();}
+/*MAN HEAD*/
+glColor3f(0.0, 1.0, 1.0);
+glTranslatef(manX,manY-0.2,0);
+glutSolidSphere(0.03,100,10);
+/*MAN BODY*/
+glBegin(GL_LINES);
+glVertex2f(0.0,-0.0);
+glVertex2f(-0.03,-0.15);
+glEnd();
+glFlush();
+glBegin(GL_LINES);
+glVertex2f(-0.03,-0.15);
+glVertex2f(0.15,-0.15);
+glEnd();
+glFlush();
+glBegin(GL_LINES);
+glVertex2f(-0.015,-0.075);
+glVertex2f(0.1,-0.075);
+glEnd();
+glFlush();
+}
 void initRendering()
 {
 glEnable(GL_DEPTH_TEST);
@@ -48,33 +88,48 @@ void drawScene()
 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 glMatrixMode(GL_MODELVIEW);
 glLoadIdentity();//Identity Matrix
-drawCar();
+drawMan();
+//glMatrixMode(GL_MODELVIEW);
+glLoadIdentity();
+drawTree();
 glutSwapBuffers();
 }
-float rt=0.5;
-void updater(int value){
+float rt=0.48;
+void update(int value) {
 if(flag==1)
 {
-carX += 0.0004f;
-if(carX>1.5)
+manY += 0.002f;
+if(manY>rt)
 {
 flag=0;
 }
 }
+if(flag==0)
+{
+cocoY-= 0.005f;
+if(cocoY<-1.2)
+flag=2;
+}
+if (flag==2)
+{
+manY -= 0.002f;
+if(manY<=-0.7)
+{
+flag=5;
+}
+}
 glutPostRedisplay();
-glutTimerFunc(1, updater, 5000);
+glutTimerFunc(1, update, 5000);
 }
 int main(int argc,char** argv)
 {
 glutInit(&argc,argv);
 glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
-glutInitWindowPosition(0,0);
-glutInitWindowSize(400,400);
-glutCreateWindow("car Bounce");
+glutInitWindowSize(500,500);
+glutCreateWindow("Coconut tree climbing");
 initRendering();
 glutDisplayFunc(drawScene);
-glutSpecialFunc(keyPress);
-glutTimerFunc(30, updater, 5000);
+glutTimerFunc(30, update, 5000);
 glutMainLoop();
 return(0);
 }
